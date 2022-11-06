@@ -1,5 +1,6 @@
 from django.urls import path
+from catalog.views import *
 
-# url_patters = [
-
-# ]
+urlpatterns = [
+    path('', homeview, name = 'homeview')
+]
