@@ -1,5 +1,5 @@
 from django.urls import path
 
-url_patters = [
-    
-]
+# url_patters = [
+
+# ]
