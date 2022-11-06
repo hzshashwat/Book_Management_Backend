@@ -13,7 +13,7 @@ def HomeView(request):
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
 
     elif request.method == 'POST' :
         #bookdata = request.data
@@ -38,7 +38,7 @@ def HomeView(request):
             book = Book.objects.all().delete()
             return Response({"message" : "All the book records have been deleted successfully."})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
 
 @api_view(['GET'])
 def NeededBooksView(request):
@@ -50,7 +50,7 @@ def NeededBooksView(request):
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
 
 @api_view(['GET'])
 def UnavailableBooksView(request):
@@ -60,7 +60,7 @@ def UnavailableBooksView(request):
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def BookView(request):
@@ -70,7 +70,7 @@ def BookView(request):
             bookjson = BookSerializers(book, many=False)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
 
     elif request.method == 'PUT' :
         #bookdata = request.data
@@ -79,8 +79,9 @@ def BookView(request):
             print(bookdata)
             bookobj = BookSerializers(data = bookdata)
             if bookobj.is_valid() == True:
-                bookobj.save()
-                return Response({"message": "Your data is saved successfully",
+                # bookobj.isbn_no = request.query_params['isbn_no']
+                bookobj.update()
+                return Response({"message": "The book record was replaced successfully.",
                 "status": "Success"
                 })
             else :
@@ -92,7 +93,18 @@ def BookView(request):
 
     elif request.method == 'DELETE' :
         try:
-            book = Book.objects.all().delete()
-            return Response({"message" : "All the book records have been deleted successfully."})
+            book = Book.objects.get(isbn_no = request.query_params['isbn_no']).delete()
+            return Response({"message" : "The book record has been deleted successfully."})
         except Exception as e:
-            return({"error":e})
+            return Response({"error":e})
+
+@api_view(['GET'])
+def IssueBookView(request) :
+    if request.method == 'GET':
+        try:
+            book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
+            book.inventory -= 1
+            book.save()
+            return Response({"message" : "Book issued successfully and Inventory updated."})
+        except Exception as e:
+            return Response({"error": e})

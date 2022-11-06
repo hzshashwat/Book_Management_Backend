@@ -5,5 +5,6 @@ urlpatterns = [
     path('books/', HomeView, name = 'homeview'),
     path('books/find_books_needed/', NeededBooksView, name= 'neededbooks'),
     path('books/unavailable_books/', UnavailableBooksView, name= 'unavailablebooks'),
-    path('book/', BookView, name= 'bookview')
+    path('book/', BookView, name= 'bookview'),
+    path('book/issue_book/', IssueBookView, name= 'issuebook')
 ]
