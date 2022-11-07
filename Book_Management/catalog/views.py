@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializer import BookSerializers
+from .serializer import BookSerializers, UpdateBookSerializers
 from catalog.models import Book
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -73,17 +73,28 @@ def BookView(request):
             return Response({"error":e})
 
     elif request.method == 'PUT' :
-        #bookdata = request.data
+        book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
         try :
-            bookdata = request.data
-            print(bookdata)
-            bookobj = BookSerializers(data = bookdata)
-            if bookobj.is_valid() == True:
-                # bookobj.isbn_no = request.query_params['isbn_no']
-                bookobj.update()
-                return Response({"message": "The book record was replaced successfully.",
-                "status": "Success"
+            bookobj = BookSerializers(book, data=request.data)
+            data = {}
+            if bookobj.is_valid():
+                bookobj.save()
+                return Response({"message" : "Book record replaced successfully."})
+            else :
+                return Response({"message": bookobj.errors,
+                "status": "Failed"
                 })
+        except Exception as e:
+            return Response({"message": e})
+    
+    elif request.method == 'PATCH' :
+        book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
+        try :
+            bookobj = BookSerializers(book, data=request.data)
+            data = {}
+            if bookobj.is_valid():
+                bookobj.save()
+                return Response({"message" : "Book record updated successfully."})
             else :
                 return Response({"message": bookobj.errors,
                 "status": "Failed"
