@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializer import BookSerializers, UpdateBookSerializers
+from .serializer import BookSerializers, ChangeRecordSerializer, UpdateRecordSerializers
 from catalog.models import Book
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -75,8 +75,7 @@ def BookView(request):
     elif request.method == 'PUT' :
         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
         try :
-            bookobj = BookSerializers(book, data=request.data)
-            data = {}
+            bookobj = ChangeRecordSerializer(book, data=request.data)
             if bookobj.is_valid():
                 bookobj.save()
                 return Response({"message" : "Book record replaced successfully."})
@@ -90,8 +89,7 @@ def BookView(request):
     elif request.method == 'PATCH' :
         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
         try :
-            bookobj = BookSerializers(book, data=request.data)
-            data = {}
+            bookobj = UpdateRecordSerializers(book, data=request.data)
             if bookobj.is_valid():
                 bookobj.save()
                 return Response({"message" : "Book record updated successfully."})
