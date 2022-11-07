@@ -13,7 +13,7 @@ def HomeView(request):
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
     elif request.method == 'POST' :
         #bookdata = request.data
@@ -31,14 +31,14 @@ def HomeView(request):
                 "status": "Failed"
                 })
         except Exception as e:
-            return Response({"message": e})
+            return Response({"message": str(e)})
 
     elif request.method == 'DELETE' :
         try:
             book = Book.objects.all().delete()
             return Response({"message" : "All the book records have been deleted successfully."})
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
 @api_view(['GET'])
 def NeededBooksView(request):
@@ -50,27 +50,32 @@ def NeededBooksView(request):
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
 @api_view(['GET'])
 def UnavailableBooksView(request):
     if request.method == 'GET' :
         book = Book.objects.all().filter(inventory = 0)
-        try:
+        try:   
             bookjson = BookSerializers(book, many=True)
             return Response({"message" : [bookjson.data]})
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def BookView(request):
     if request.method == 'GET' :
-        book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
         try:
+            book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
             bookjson = BookSerializers(book, many=False)
-            return Response({"message" : [bookjson.data]})
+            if bookjson.is_valid() == True:
+                return Response({"message" : [bookjson.data]})
+            else:
+                return Response({"message": bookjson.errors,
+                "status": "Failed"
+                })
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
     elif request.method == 'PUT' :
         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
@@ -84,7 +89,7 @@ def BookView(request):
                 "status": "Failed"
                 })
         except Exception as e:
-            return Response({"message": e})
+            return Response({"message": str(e)})
     
     elif request.method == 'PATCH' :
         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
@@ -98,14 +103,14 @@ def BookView(request):
                 "status": "Failed"
                 })
         except Exception as e:
-            return Response({"message": e})
+            return Response({"message": str(e)})
 
     elif request.method == 'DELETE' :
         try:
             book = Book.objects.get(isbn_no = request.query_params['isbn_no']).delete()
             return Response({"message" : "The book record has been deleted successfully."})
         except Exception as e:
-            return Response({"error":e})
+            return Response({"error": str(e)})
 
 @api_view(['GET'])
 def IssueBookView(request) :
@@ -116,4 +121,4 @@ def IssueBookView(request) :
             book.save()
             return Response({"message" : "Book issued successfully and Inventory updated."})
         except Exception as e:
-            return Response({"error": e})
+            return Response({"error": str(e)})
