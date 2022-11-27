@@ -68,12 +68,12 @@ def BookView(request):
         try:
             book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
             bookjson = BookSerializers(book, many=False)
-            if bookjson.is_valid() == True:
-                return Response({"message" : [bookjson.data]})
-            else:
-                return Response({"message": bookjson.errors,
-                "status": "Failed"
-                })
+            #if bookjson.is_valid() == True:
+            return Response({"message" : [bookjson.data]})
+            # else:
+            #     return Response({"message": bookjson.errors,
+            #     "status": "Failed"
+            #     })
         except Exception as e:
             return Response({"error": str(e)})
 
